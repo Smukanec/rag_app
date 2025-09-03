@@ -1,6 +1,10 @@
 # RAG Application
 
+![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
+
 ## Installation
+
+Requires Python 3.10+.
 
 Install dependencies:
 
