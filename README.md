@@ -18,6 +18,30 @@ Set multiple API keys:
 export API_KEYS="key1,key2"
 ```
 
+## Running
+
+By default the application listens on port `8000`. To use a different port when
+running directly with Python, set the `PORT` environment variable before
+launching:
+
+```bash
+export PORT=9000
+python app.py
+```
+
+If you run the app with an ASGI server like Uvicorn or Gunicorn, you can set the
+port with the same environment variable or by using their command‑line options:
+
+```bash
+# Uvicorn
+export PORT=9000
+uvicorn app:app --port $PORT   # or: uvicorn app:app --port 9000
+
+# Gunicorn
+export PORT=9000
+gunicorn app:app -b 0.0.0.0:$PORT   # or: gunicorn app:app -b 0.0.0.0:9000
+```
+
 ## Production
 
 For server deployments, run the `install.sh` script. It performs the following steps:
