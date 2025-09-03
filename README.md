@@ -155,3 +155,16 @@ curl http://localhost:8000/v1/embeddings \
       }'
 ```
 
+## Troubleshooting
+
+### Common checks
+
+- View container logs with `docker logs <container>`
+- Verify the service is healthy: `curl http://localhost:${PORT:-8000}/healthz`
+- Ensure required environment variables are set, e.g. `echo $API_KEYS`
+
+### Resolving common failures
+
+- **Port conflicts** – If the port is already in use, stop the conflicting process or change the `PORT` value before starting the app.
+- **Missing GPU support** – Make sure the host has NVIDIA drivers, CUDA, and the NVIDIA Container Toolkit installed. Start containers with GPU access (e.g. `--gpus all`) and confirm availability with `nvidia-smi`.
+
