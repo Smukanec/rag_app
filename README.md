@@ -77,6 +77,17 @@ git clone https://github.com/ollama/ollama.git
 cd ollama && docker build -t ollama .
 ```
 
+### GPU prerequisites
+
+Running these images requires a GPU-enabled Docker setup with:
+
+- NVIDIA drivers
+- CUDA toolkit
+- NVIDIA Container Toolkit (`nvidia-docker2`)
+
+Follow the official installation guide for configuring GPU support in Docker:
+<https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html>
+
 These containers expect an NVIDIA GPU. Lightweight models may run on GPUs with
 roughly 8 GB of VRAM, while larger models can require 16–24 GB or more. Refer to
 the upstream repositories for details:
