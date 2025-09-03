@@ -305,6 +305,7 @@ class App(tk.Tk):
         self._watchdog_after_id = None
         self._cancel = False
         self.chat_history: list[dict[str, str]] = []
+        self._load_memory_history()
 
         top = ttk.Frame(self)
         top.pack(fill="x", padx=8, pady=6)
@@ -387,6 +388,23 @@ class App(tk.Tk):
         self.after(200, _show_gpu_preflight)
 
     # ---- helpers ----
+    def _load_memory_history(self, max_entries: int = 20):
+        try:
+            with open(MEM_PATH, "r", encoding="utf-8") as f:
+                lines = f.readlines()[-max_entries:]
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                except Exception:
+                    continue
+                self.chat_history.append({"role": "user", "content": rec.get("question", "")})
+                self.chat_history.append({"role": "assistant", "content": rec.get("answer", "")})
+        except Exception:
+            pass
+
     def refresh_models(self):
         self.models_cpu = list_local_models()
         all_models = self.models_cpu + self.models_gpu
