@@ -304,6 +304,7 @@ class App(tk.Tk):
 
         self._watchdog_after_id = None
         self._cancel = False
+        self.chat_history: list[dict[str, str]] = []
 
         top = ttk.Frame(self)
         top.pack(fill="x", padx=8, pady=6)
@@ -452,8 +453,9 @@ class App(tk.Tk):
         question = self.q_txt.get("1.0", "end").strip()
         if not question:
             return
-
-        self.set_answer("…")
+        self.q_txt.delete("1.0", "end")
+        self.chat_history.append({"role": "user", "content": question})
+        self.append_answer(f"\nTy: {question}\n")
         self._start_progress()
 
         def task():
@@ -481,7 +483,10 @@ class App(tk.Tk):
                     "Jsi stručný a přesný český asistent. Pokud máš kontext ze znalostí/webu, prioritizuj fakta z něj. "
                     "Když něco nevíš, řekni to krátce."
                 )
-                prompt = build_prompt(sys_prompt, question, rag_ctx, web_ctx_str)
+                history_txt = "".join(
+                    [f"{'U' if m['role']=='user' else 'A'}: {m['content']}\n" for m in self.chat_history]
+                )
+                prompt = build_prompt(sys_prompt, history_txt.rstrip(), rag_ctx, web_ctx_str)
 
                 # Rozhodnutí backendu
                 use_gpu = False
@@ -499,10 +504,9 @@ class App(tk.Tk):
                 used_label = f"GPU:{gpu_model}" if (use_gpu and gpu_model) else ("GPU:auto" if use_gpu else model)
 
                 def _header():
-                    self.a_txt.config(state="normal")
-                    self.a_txt.delete("1.0", "end")
-                    self.a_txt.insert("1.0", f"[backend: {'GPU' if use_gpu else 'CPU'}] [model: {used_label}] (ctx={num_ctx}, max={num_predict})\n\n")
-                    self.a_txt.config(state="disabled")
+                    self.append_answer(
+                        f"AI [backend: {'GPU' if use_gpu else 'CPU'}] [model: {used_label}] (ctx={num_ctx}, max={num_predict})\n"
+                    )
                 self.after(0, _header)
 
                 if use_gpu:
@@ -514,7 +518,7 @@ class App(tk.Tk):
                         temperature=0.4,
                         timeout=self.REQUEST_TIMEOUT,
                     )
-                    self.after(0, lambda text=answer: self.append_answer(text))
+                    self.after(0, lambda text=answer: self.append_answer(text + "\n"))
                 else:
                     answer = stream_ollama(
                         model,
@@ -526,6 +530,7 @@ class App(tk.Tk):
                         on_chunk=lambda ch: self.after(0, lambda text=ch: self.append_answer(text)),
                         is_cancelled=lambda: self._cancel,
                     )
+                    self.after(0, lambda: self.append_answer("\n"))
 
                 meta = {
                     "websearch": web_meta,
@@ -534,6 +539,7 @@ class App(tk.Tk):
                     "gpu_model": gpu_model,
                 }
                 append_memory(used_label, question, answer if answer else "", meta)
+                self.chat_history.append({"role": "assistant", "content": answer if answer else ""})
 
                 def add_sources():
                     src_lines = []
@@ -552,7 +558,7 @@ class App(tk.Tk):
             except Exception as e:
                 err = f"{type(e).__name__}: {e}"
                 extra = f"\nGPU_BASE_URL={GPU_BASE_URL} (raw={GPU_BASE_URL_RAW}, INSECURE={'ON' if GPU_INSECURE else 'OFF'}, FORCE_H1={'ON' if GPU_FORCE_H1 else 'OFF'})"
-                self.after(0, lambda err=err, extra=extra: self.set_answer(f"Chyba: {err}{extra}"))
+                self.after(0, lambda err=err, extra=extra: self.append_answer(f"Chyba: {err}{extra}\n"))
             finally:
                 self.after(0, self._stop_progress)
 
