@@ -22,3 +22,54 @@ Example request with Bearer token header:
 curl -H "Authorization: Bearer key1" http://localhost:8000/v1/example
 ```
 
+## Usage examples
+
+### Health check
+
+```bash
+curl http://localhost:8000/healthz
+```
+
+### List available models
+
+```bash
+curl -H "Authorization: Bearer key1" http://localhost:8000/v1/models
+```
+
+### Create chat completion
+
+```bash
+curl http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer key1" \
+  -d '{
+        "model": "gpt-3.5-turbo",
+        "messages": [{"role": "user", "content": "Hello!"}]
+      }'
+```
+
+#### Streaming chat completion
+
+```bash
+curl -N http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer key1" \
+  -d '{
+        "model": "gpt-3.5-turbo",
+        "messages": [{"role": "user", "content": "Hello!"}],
+        "stream": true
+      }'
+```
+
+### Create embeddings
+
+```bash
+curl http://localhost:8000/v1/embeddings \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer key1" \
+  -d '{
+        "model": "text-embedding-ada-002",
+        "input": "hello world"
+      }'
+```
+
