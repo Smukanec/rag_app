@@ -18,6 +18,24 @@ Set multiple API keys:
 export API_KEYS="key1,key2"
 ```
 
+## Production
+
+For server deployments, run the `install.sh` script. It performs the following steps:
+
+1. Creates and enables a `rag_app.service` systemd unit so the application runs on startup.
+2. Configures firewall rules (e.g., via `ufw`) to allow incoming traffic on the app's port.
+
+After installation, environment variables can be customized in `/etc/systemd/system/rag_app.service`.
+Edit the `[Service]` section to set values such as the listening port and API keys:
+
+```ini
+[Service]
+Environment="PORT=8000"
+Environment="API_KEYS=key1,key2"
+```
+
+Run `sudo systemctl daemon-reload && sudo systemctl restart rag_app` after making changes.
+
 ## Endpoints
 
 Example request with Bearer token header:
