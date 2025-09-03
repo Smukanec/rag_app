@@ -60,6 +60,31 @@ Environment="API_KEYS=key1,key2"
 
 Run `sudo systemctl daemon-reload && sudo systemctl restart rag_app` after making changes.
 
+## Running Local Models via Docker
+
+You can run OpenAI‑compatible servers locally via Docker. Acquire or build an image
+for the model host you prefer:
+
+```bash
+# vLLM
+docker pull vllm/vllm-openai:latest
+
+# Text Generation Inference
+docker pull ghcr.io/huggingface/text-generation-inference:latest
+
+# Ollama (build from source)
+git clone https://github.com/ollama/ollama.git
+cd ollama && docker build -t ollama .
+```
+
+These containers expect an NVIDIA GPU. Lightweight models may run on GPUs with
+roughly 8 GB of VRAM, while larger models can require 16–24 GB or more. Refer to
+the upstream repositories for details:
+
+- vLLM – <https://github.com/vllm-project/vllm>
+- Text Generation Inference – <https://github.com/huggingface/text-generation-inference>
+- Ollama – <https://github.com/ollama/ollama>
+
 ## Endpoints
 
 Example request with Bearer token header:
