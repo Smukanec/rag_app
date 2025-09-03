@@ -6,9 +6,11 @@
 
 Requires Python 3.10+.
 
-Install dependencies:
+Create and activate a virtual environment before installing dependencies:
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows use: .venv\\Scripts\\activate
 pip install -r requirements.txt
 ```
 
@@ -25,11 +27,13 @@ running directly with Python, set the `PORT` environment variable before
 launching:
 
 ```bash
+# from the project root, with the virtual environment activated
 export PORT=9000
 python app.py
 ```
 
-If you run the app with an ASGI server like Uvicorn or Gunicorn, you can set the
+If you run the app with an ASGI server like Uvicorn or Gunicorn, ensure your
+virtual environment is active. You can set the
 port with the same environment variable or by using their command‑line options:
 
 ```bash
