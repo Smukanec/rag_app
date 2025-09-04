@@ -506,7 +506,8 @@ class App(tk.Tk):
                     web_ctx_str = build_web_context(ws)
                     web_meta = ws
                 sys_prompt = (
-                    "Jsi stručný a přesný český asistent. Pokud máš kontext ze znalostí/webu, prioritizuj fakta z něj. "
+                    "Jsi stručný a přesný český asistent. Odpovídej vždy v češtině, pokud uživatel výslovně "
+                    "nepožádá o jiný jazyk. Pokud máš kontext ze znalostí/webu, prioritizuj fakta z něj. "
                     "Když něco nevíš, řekni to krátce."
                 )
                 history_txt = "".join(
