@@ -2,6 +2,24 @@
 
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
 
+## Supported API Models
+
+The application can use the following GPU API models:
+
+- jarvik-rag:latest
+- everythinglm:13b-16k
+- jarvik-chat:latest
+- jarvik-coder:latest
+- CognitiveComputations/dolphin-llama3.1:8b
+- dolphincoder:15b-starcoder2-q5_K_M
+- gpt-oss:latest
+- starcoder:7b
+- mistral:7b
+- codellama:7b-instruct
+- nous-hermes2:latest
+- command-r:latest
+- llama3:8b
+
 ## Installation
 
 Requires Python 3.10+.

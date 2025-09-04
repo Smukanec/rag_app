@@ -82,7 +82,7 @@ def _init_gpu_client():
         except Exception as e2:
             GPU_ERR = f"{type(e).__name__}: {e} | RAW /models FAIL -> {type(e2).__name__}: {e2}"
 
-def gpu_preflight_models(max_show: int = 7) -> str:
+def gpu_preflight_models(max_show: int = 20) -> str:
     """Vrátí string s informací o dostupnosti GPU API (seznam modelů nebo chybu)."""
     if GPU_CLIENT is None:
         _init_gpu_client()
@@ -326,6 +326,12 @@ class App(tk.Tk):
         ttk.Label(top, text="Model:").pack(side="left", padx=(8, 0))
         self.models_cpu = list_local_models()
         self.models_gpu = [
+            "gpu:jarvik-rag:latest",
+            "gpu:everythinglm:13b-16k",
+            "gpu:jarvik-chat:latest",
+            "gpu:jarvik-coder:latest",
+            "gpu:CognitiveComputations/dolphin-llama3.1:8b",
+            "gpu:dolphincoder:15b-starcoder2-q5_K_M",
             "gpu:gpt-oss:latest",
             "gpu:starcoder:7b",
             "gpu:mistral:7b",
@@ -336,7 +342,13 @@ class App(tk.Tk):
         ]
         all_models = self.models_cpu + self.models_gpu
         self.model_var = tk.StringVar(value="")
-        self.model_cb = ttk.Combobox(top, textvariable=self.model_var, values=all_models, state="readonly", width=38)
+        self.model_cb = ttk.Combobox(
+            top,
+            textvariable=self.model_var,
+            values=all_models,
+            state="readonly",
+            width=60,
+        )
         self.model_cb.pack(side="left", padx=(0, 8))
         ttk.Button(top, text="Refresh", command=self.refresh_models).pack(side="left")
 
