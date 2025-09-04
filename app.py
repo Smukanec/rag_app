@@ -219,9 +219,16 @@ def rag_retrieve(question: str, k: int = 1) -> list[dict]:
     if not chunks:
         return []
     qkw = keywords(question)
-    scored = [(score_chunk(qkw, ch["text"]), ch) for ch in chunks]
-    scored = [x for x in scored if x[0] > 0]
-    scored.sort(key=lambda x: x[0], reverse=True)
+    best_per_file: dict[str, tuple[int, dict]] = {}
+    for ch in chunks:
+        sc = score_chunk(qkw, ch["text"])
+        if sc <= 0:
+            continue
+        fname = ch["file"]
+        prev = best_per_file.get(fname)
+        if prev is None or sc > prev[0]:
+            best_per_file[fname] = (sc, ch)
+    scored = sorted(best_per_file.values(), key=lambda x: x[0], reverse=True)
     return [it[1] for it in scored[:k]]
 
 # ---------- WebSearch ----------
@@ -299,7 +306,7 @@ class App(tk.Tk):
         # defaulty
         self.REQUEST_TIMEOUT = 240
         self.DEFAULT_NUM_CTX = 896
-        self.RAG_TOPK = 1
+        self.RAG_TOPK = 3
         self.WEB_TOPK = 1
 
         self._watchdog_after_id = None
@@ -418,9 +425,10 @@ class App(tk.Tk):
             return "break"
 
     def open_knowledge_tip(self):
+        blk_word = "blok" if self.RAG_TOPK == 1 else "bloky"
         messagebox.showinfo(
             "Knowledge",
-            f"Vlož své .txt soubory do:\n{KNOW_DIR}\n\nPři dotazu se vybere {self.RAG_TOPK} nejrelevantnější blok (keyword rank).",
+            f"Vlož své .txt soubory do:\n{KNOW_DIR}\n\nPři dotazu se vybere {self.RAG_TOPK} nejrelevantnější {blk_word} (keyword rank).",
         )
 
     def show_memory_tip(self):
