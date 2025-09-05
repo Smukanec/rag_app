@@ -391,6 +391,9 @@ class App(tk.Tk):
         frm_a.pack(fill="both", expand=True, padx=8, pady=(0, 8))
         self.a_txt = tk.Text(frm_a, height=18, wrap="word")
         self.a_txt.pack(fill="both", expand=True, padx=6, pady=6)
+        self.a_txt.tag_configure("question", foreground="royalblue")
+        self.a_txt.tag_configure("answer", foreground="seagreen")
+        self.a_txt.tag_configure("note", foreground="brown")
         self.a_txt.config(state="disabled")
 
         insecure_flag = "ON" if GPU_INSECURE else "OFF"
@@ -456,9 +459,9 @@ class App(tk.Tk):
         self.a_txt.insert("1.0", text)
         self.a_txt.config(state="disabled")
 
-    def append_answer(self, text: str):
+    def append_answer(self, text: str, tag: str = "answer"):
         self.a_txt.config(state="normal")
-        self.a_txt.insert("end", text)
+        self.a_txt.insert("end", text, tag)
         self.a_txt.see("end")
         self.a_txt.config(state="disabled")
 
@@ -493,7 +496,7 @@ class App(tk.Tk):
             return
         self.q_txt.delete("1.0", "end")
         self.chat_history.append({"role": "user", "content": question})
-        self.append_answer(f"\nTy: {question}\n")
+        self.append_answer(f"\nTy: {question}\n", "question")
         self._start_progress()
 
         def task():
@@ -544,7 +547,8 @@ class App(tk.Tk):
 
                 def _header():
                     self.append_answer(
-                        f"AI [backend: {'GPU' if use_gpu else 'CPU'}] [model: {used_label}] (ctx={num_ctx}, max={num_predict})\n"
+                        f"AI [backend: {'GPU' if use_gpu else 'CPU'}] [model: {used_label}] (ctx={num_ctx}, max={num_predict})\n",
+                        "note",
                     )
                 self.after(0, _header)
 
@@ -589,15 +593,15 @@ class App(tk.Tk):
                     if rag_ctx:
                         src_lines.append("Zdroje (Knowledge): " + ", ".join(sorted({c['file'] for c in rag_ctx})))
                     if src_lines:
-                        self.append_answer("\n" + "\n".join(src_lines))
+                        self.append_answer("\n" + "\n".join(src_lines), "note")
                 self.after(0, add_sources)
 
             except requests.exceptions.Timeout:
-                self.after(0, lambda: self.append_answer("\n\n[⚠ timeout] Zkrať dotaz nebo zapni Rychlý mód (★)."))
+                self.after(0, lambda: self.append_answer("\n\n[⚠ timeout] Zkrať dotaz nebo zapni Rychlý mód (★).", "note"))
             except Exception as e:
                 err = f"{type(e).__name__}: {e}"
                 extra = f"\nGPU_BASE_URL={GPU_BASE_URL} (raw={GPU_BASE_URL_RAW}, INSECURE={'ON' if GPU_INSECURE else 'OFF'}, FORCE_H1={'ON' if GPU_FORCE_H1 else 'OFF'})"
-                self.after(0, lambda err=err, extra=extra: self.append_answer(f"Chyba: {err}{extra}\n"))
+                self.after(0, lambda err=err, extra=extra: self.append_answer(f"Chyba: {err}{extra}\n", "note"))
             finally:
                 self.after(0, self._stop_progress)
 
